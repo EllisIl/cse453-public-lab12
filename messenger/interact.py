@@ -2,7 +2,7 @@
 # COMPONENT:
 #    INTERACT
 # Author:
-#    Br. Helfrich, Kyle Mueller, <your name here if you made a change>
+#    Br. Helfrich, Kyle Mueller, Lincoln Allen
 # Summary: 
 #    This class allows one user to interact with the system
 ########################################################################
@@ -30,7 +30,9 @@ userlist = [
 # USERS
 # All the users currently in the system
 ###############################################################
-users = [*map(lambda u: User(*u), userlist)]
+users = []
+for name, pwd in userlist:
+    users.append(User(name, pwd))
 
 ID_INVALID = -1
 
@@ -44,10 +46,10 @@ class Interact:
     # INTERACT CONSTRUCTOR
     # Authenticate the user and get him/her all set up
     ##################################################
-    def __init__(self, username, password, messages):
+    def __init__(self, username, password, messages_):
         self._authenticate(username, password)
         self._username = username
-        self._p_messages = messages
+        self._p_messages = messages_
 
     ##################################################
     # INTERACT :: SHOW
@@ -56,7 +58,7 @@ class Interact:
     def show(self):
         id_ = self._prompt_for_id("display")
         if not self._p_messages.show(id_):
-            print(f"ERROR! Message ID \'{id_}\' does not exist")
+            print(f"ERROR! Message ID '{id_}' does not exist")
         print()
 
     ##################################################
@@ -83,8 +85,11 @@ class Interact:
     ################################################## 
     def update(self):
         id_ = self._prompt_for_id("update")
-        if not self._p_messages.show(id_):
-            print(f"ERROR! Message ID \'{id_}\' does not exist\n")
+        # First, ensure the ID refers to an existing message. We do
+        # not perform any access-control check here; that is handled
+        # by the Messages.update method via Bell-LaPadula.
+        if not self._p_messages.exists(id_):
+            print(f"ERROR! Message ID '{id_}' does not exist\n")
             return
         self._p_messages.update(id_, self._prompt_for_line("message"))
         print()

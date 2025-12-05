@@ -2,7 +2,7 @@
 # Program:
 #    Lab 12, Bell-LaPadula
 # Author:
-#    Br. Helfrich, Kyle Mueller, <your name here if you made a change>
+#    Br. Helfrich, Kyle Mueller, Lincoln Allen
 # Summary: 
 #    This program is designed to keep track of a number of secret
 #    messages. IT will display messages to the appropriate users
@@ -10,7 +10,7 @@
 ########################################################################
 
 from os import path
-import interact, messages
+import interact, messages, control
 
 # Gets the absolute path of the "messages.txt" file
 FILE_NAME = path.join(path.dirname(path.abspath(__file__)), "messages.txt")
@@ -47,7 +47,7 @@ def simple_prompt(prompt):
 # SESSION
 # One login session
 ####################################################
-def session(messages):
+def session(messages_):
     open_session()
 
     print("Users:")
@@ -55,7 +55,10 @@ def session(messages):
     username = simple_prompt("\nWhat is your username? ")
     password = simple_prompt("What is your password? ")
 
-    interact_ = interact.Interact(username, password, messages)
+    # Associate this session with the current user for access control.
+    control.set_current_user(username)
+
+    interact_ = interact.Interact(username, password, messages_)
     print(f"\nWelcome, {username}. Please select an option:\n")
     display_options()
 
@@ -71,7 +74,7 @@ def session(messages):
 
     while session_open:
         option = input(f"{username}> ")
-        exec(options.get(option, "print(f\"Unknown option: \'{option}\'\");"))
+        exec(options.get(option, "print(f\"Unknown option: '{option}'\");"))
 
 ####################################################
 # MAIN
