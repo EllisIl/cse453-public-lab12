@@ -12,10 +12,10 @@ class TestBellLaPadula(unittest.TestCase):
         SeamanSam (Confidential) -> Secret Message
         Tests that a lower level user cannot read a higher level, higher level information is safe from a lower level double agent.
         """
-        subject = "Confidential"
-        obj = "Secret"
+        subject = "1"
+        obj ="3"
         # Expect false
-        self.assertFalse(control.verify_read(subject, obj), 
+        self.assertFalse(control.can_read_message(subject, obj), 
                          "FAIL: Confidential user should NOT read Secret data")
 
     def test_read_down(self):
@@ -27,7 +27,7 @@ class TestBellLaPadula(unittest.TestCase):
         subject = "Secret"
         obj = "Confidential"
         # Expect true
-        self.assertTrue(control.verify_read(subject, obj), 
+        self.assertTrue(control.can_read_message(subject, obj), 
                         "FAIL: Secret user SHOULD be able to read Confidential data")
 
     def test_read_same(self):
@@ -35,7 +35,7 @@ class TestBellLaPadula(unittest.TestCase):
         PASS CASE: Equal levels.
         Checks that users can read their own level of messages
         """
-        self.assertTrue(control.verify_read("Secret", "Secret"))
+        self.assertTrue(control.can_read_message("Secret", "Secret"))
 
     # 2. TEST STAR PROPERTY (WRITE ACCESS)
     # Rule: Subject Level <= Object Level
@@ -49,7 +49,7 @@ class TestBellLaPadula(unittest.TestCase):
         subject = "Secret"
         obj = "Public"
         # Expect False 
-        self.assertFalse(control.verify_write(subject, obj), 
+        self.assertFalse(control.can_write_message(subject, obj), 
                          "FAIL: Secret user should NOT write to Public (Write Down)")
 
     def test_write_same(self):
@@ -57,7 +57,7 @@ class TestBellLaPadula(unittest.TestCase):
         PASS CASE: Equal levels.
         Tests that a security level can write to the same level messages.
         """
-        self.assertTrue(control.verify_write("Secret", "Secret"))
+        self.assertTrue(control.can_write_message("Secret", "Secret"))
 
     def test_write_up(self):
         """
@@ -67,7 +67,7 @@ class TestBellLaPadula(unittest.TestCase):
         """
         subject = "Confidential"
         obj = "Secret"
-        self.assertTrue(control.verify_write(subject, obj), 
+        self.assertTrue(control.can_write_message(subject, obj), 
                         "FAIL: BLP allows writing up (blind write)")
 
 
