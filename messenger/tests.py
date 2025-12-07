@@ -93,6 +93,43 @@ class TestBellLaPadula(unittest.TestCase):
         # Charlie created a report of what the men prefer to have for lunch and wants to update the message for the cooks.
        
 
+    def test_unknown_user_defaults_to_public(self):
+        """
+        FAIL CASE: Unknown user should default to PUBLIC clearance
+        and therefore cannot read Confidential information.
+        """
+        # Make sure the test message is classified
+        control.register_message(5, label="Confidential")
+
+        # Unknown user "RandomGuy" -> treated as PUBLIC
+        control.set_current_user("RandomGuy")
+
+        # Should fail because PUBLIC < CONFIDENTIAL
+        self.assertFalse(
+            control.can_read_message(5),
+            "Unknown users default to PUBLIC and cannot read Confidential messages"
+        )
+ 
+    def test_public_user_can_write_to_secret(self):
+        """
+        PASS CASE: A PUBLIC user can write UP to a Secret message.
+        This follows the *-property (no write DOWN), but allows
+        writing UP (blind write).
+        """
+        # Register message 6 as Secret
+        control.register_message(6, label="Secret")
+
+        # Explicitly set current user to a Public user
+        control.set_current_user("Visitor")   # Not in user list -> PUBLIC
+
+        # Should PASS because PUBLIC <= SECRET
+        self.assertTrue(
+            control.can_write_message(6),
+            "Public users should be allowed to write UP to Secret messages"
+        )
+ 
+
+
 if __name__ == '__main__':
     print("Running Bell-LaPadula Verification Tests...")
     unittest.main()
